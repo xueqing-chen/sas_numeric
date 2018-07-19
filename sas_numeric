@@ -1,0 +1,32 @@
+
+proc contents data=target_verify_address out=cont;
+run;
+proc sql noprint;
+select compress(name||'='||'_'||name) into: renames separated by' '
+from cont where type=2 and name like '%location%' and name ne 'location_resident_city' ;
+
+select compress(name||'=_'||name||"+0;")into: tochar separated by' '
+from cont where type=2 and name like '%location%' and name ne 'location_resident_city';  
+
+select compress(name) into: InputVar_List separated by ' ' 
+from cont where type=2 and name like '%location%' and name ne 'location_resident_city';  
+quit;
+
+
+data target_verify_address_1;
+set target_verify_address (rename=(&renames.));
+&tochar;
+drop _: ;
+run; 
+
+data target_verify_address_1;
+set target_verify_address (rename=(&renames.));
+array a &a;
+array b &b;
+do i =1 to dim(a);
+
+   b[i]=a[i]+0;
+
+end;
+drop _: ;
+run; 
